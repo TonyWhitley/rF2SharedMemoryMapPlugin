@@ -28,6 +28,7 @@ private:
   char** mppMessageCenterMessages = nullptr;
   float* mpCurrPitSpeedLimit = nullptr;
   char* mpLSIMessages = nullptr;
+  float* mpSCSpeed = nullptr;
 
   char mPrevStatusMessage[rF2MappedBufferHeader::MAX_STATUS_MSG_LEN];
   char mPrevLastHistoryMessage[rF2MappedBufferHeader::MAX_STATUS_MSG_LEN];
@@ -35,6 +36,7 @@ private:
   char mPrevLSIPitStateMessage[rF2MappedBufferHeader::MAX_RULES_INSTRUCTION_MSG_LEN];
   char mPrevLSIOrderInstructionMessage[rF2MappedBufferHeader::MAX_RULES_INSTRUCTION_MSG_LEN];
   char mPrevLSIRulesInstructionMessage[rF2MappedBufferHeader::MAX_RULES_INSTRUCTION_MSG_LEN];
+  float mPrevSCSpeed = 0.0f;
 
   bool mSCRPluginEnabled = false;
   long mSCRPluginDoubleFileType = -1L;

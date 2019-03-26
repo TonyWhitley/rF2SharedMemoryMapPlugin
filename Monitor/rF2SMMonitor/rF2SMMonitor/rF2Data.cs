@@ -899,6 +899,8 @@ namespace rF2SMMonitor
       public Int64 mTicksLSIRulesInstructionMessageUpdated;     // Ticks when last FCY rules message was updated.  Currently, only SCR plugin sets that.
       [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = rFactor2Constants.MAX_RULES_INSTRUCTION_MSG_LEN)]
       public byte[] mLSIRulesInstructionMessage;
+
+      public float mSCSpeedMS;  // Current SC speed.  Valid only when session is started.  If SC is not present, value is 999999.0f
     }
   }
 }

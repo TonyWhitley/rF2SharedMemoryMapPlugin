@@ -50,6 +50,17 @@ bool DirectMemoryReader::Initialize()
       return false;
     }
 
+    auto const pRoot = reinterpret_cast<char*>(Utils::FindPatternForPointerInMemory(module,
+      reinterpret_cast<unsigned char*>("\x33\xDB\x4C\x8D\x3D\xC7\x3F\x06\x01\x8B\xF3\x45\x85\xF6"),
+      "xxxxx????xxxxx", 5u));
+
+    if (pRoot == nullptr) {
+      DEBUG_MSG(DebugLevel::Errors, "ERROR: Failed to resolve SC speed pointer.");
+      return false;
+    }
+
+    mpSCSpeed = reinterpret_cast<float*>(pRoot + 0xC7C0);
+
     auto const endTicks = TicksNow();
 
     if (SharedMemoryPlugin::msDebugOutputLevel >= DebugLevel::DevInfo) {
@@ -60,6 +71,7 @@ bool DirectMemoryReader::Initialize()
       auto const addr2 = *reinterpret_cast<char**>(reinterpret_cast<uintptr_t>(::GetModuleHandle(nullptr)) + 0x14D31E0uLL);
       auto const addr3 = reinterpret_cast<float*>(reinterpret_cast<uintptr_t>(::GetModuleHandle(nullptr)) + 0x14B4D0CuLL);
       auto const addr4 = reinterpret_cast<char*>(reinterpret_cast<uintptr_t>(::GetModuleHandle(nullptr)) + 0x14D3268uLL);
+      auto const addr5 = reinterpret_cast<char*>(reinterpret_cast<uintptr_t>(::GetModuleHandle(nullptr)) + 0x14B3750uLL);
 
       DEBUG_ADDR2(DebugLevel::DevInfo, "A1", mpStatusMessage);
       DEBUG_ADDR2(DebugLevel::DevInfo, "A11", addr1);
@@ -80,6 +92,11 @@ bool DirectMemoryReader::Initialize()
       DEBUG_ADDR2(DebugLevel::DevInfo, "A41", addr4);
       DEBUG_ADDR2(DebugLevel::DevInfo, "O4", reinterpret_cast<uintptr_t>(mpLSIMessages) - reinterpret_cast<uintptr_t>(module));
       DEBUG_ADDR2(DebugLevel::DevInfo, "O41", 0x14D3268uLL);
+
+      DEBUG_ADDR2(DebugLevel::DevInfo, "A5", mpSCSpeed);
+      DEBUG_ADDR2(DebugLevel::DevInfo, "A51", addr5);
+      DEBUG_ADDR2(DebugLevel::DevInfo, "O5", reinterpret_cast<uintptr_t>(mpSCSpeed) - reinterpret_cast<uintptr_t>(module));
+      DEBUG_ADDR2(DebugLevel::DevInfo, "O51", 0x14B3750uLL);
     }
   }
   __except (::GetExceptionCode() == EXCEPTION_ACCESS_VIOLATION ? EXCEPTION_EXECUTE_HANDLER : EXCEPTION_CONTINUE_SEARCH) {
@@ -94,9 +111,15 @@ bool DirectMemoryReader::Initialize()
 bool DirectMemoryReader::Read(rF2Extended& extended)
 {
   __try {
-    if (mpStatusMessage == nullptr || mppMessageCenterMessages == nullptr || mpCurrPitSpeedLimit == nullptr) {
+    if (mpStatusMessage == nullptr || mppMessageCenterMessages == nullptr || mpCurrPitSpeedLimit == nullptr || mpSCSpeed == nullptr) {
       assert(false && "DMR not available, should not call.");
       return false;
+    }
+
+    extended.mSCSpeedMS = *mpSCSpeed;
+    if (mPrevSCSpeed != extended.mSCSpeedMS) {
+      mPrevSCSpeed = extended.mSCSpeedMS;
+      DEBUG_FLOAT2(DebugLevel::DevInfo, "SC Speed changed: ", extended.mSCSpeedMS);
     }
 
     strcpy_s(extended.mStatusMessage, mpStatusMessage);
@@ -184,7 +207,7 @@ bool DirectMemoryReader::Read(rF2Extended& extended)
 bool DirectMemoryReader::ReadOnNewSession(rF2Extended& extended)
 {
   __try {
-    if (mpStatusMessage == nullptr || mppMessageCenterMessages == nullptr || mpCurrPitSpeedLimit == nullptr) {
+    if (mpStatusMessage == nullptr || mppMessageCenterMessages == nullptr || mpCurrPitSpeedLimit == nullptr || mpSCSpeed == nullptr) {
       assert(false && "DMR not available, should not call.");
       return false;
     }
@@ -205,7 +228,7 @@ bool DirectMemoryReader::ReadOnNewSession(rF2Extended& extended)
 bool DirectMemoryReader::ReadOnLSIVisible(rF2Extended& extended)
 {
   __try {
-    if (mpStatusMessage == nullptr || mppMessageCenterMessages == nullptr || mpCurrPitSpeedLimit == nullptr || mpLSIMessages == nullptr) {
+    if (mpStatusMessage == nullptr || mppMessageCenterMessages == nullptr || mpCurrPitSpeedLimit == nullptr || mpLSIMessages == nullptr || mpSCSpeed == nullptr) {
       assert(false && "DMR not available, should not call.");
       return false;
     }

@@ -692,7 +692,7 @@ namespace rF2SMMonitor
         this.maxFFBValue = Math.Max(Math.Abs(this.forceFeedback.mForceValue), this.maxFFBValue);
 
         gameStateText.Append(
-          $"Plugin Version:    Expected: 3.5.0.7 64bit   Actual: {MainForm.GetStringFromBytes(this.extended.mVersion)} {(this.extended.is64bit == 1 ? "64bit" : "32bit")}{(this.extended.mSCRPluginEnabled == 1 ? "    SCR Plugin enabled" : "")}{(this.extended.mDirectMemoryAccessEnabled == 1 ? "    DMA enabled" : "")}    FPS: {this.fps}    FFB Curr: {this.forceFeedback.mForceValue:N3}  Max: {this.maxFFBValue:N3}");
+          $"Plugin Version:    Expected: 3.5.0.8 64bit   Actual: {MainForm.GetStringFromBytes(this.extended.mVersion)} {(this.extended.is64bit == 1 ? "64bit" : "32bit")}{(this.extended.mSCRPluginEnabled == 1 ? "    SCR Plugin enabled" : "")}{(this.extended.mDirectMemoryAccessEnabled == 1 ? "    DMA enabled" : "")}    FPS: {this.fps}    FFB Curr: {this.forceFeedback.mForceValue:N3}  Max: {this.maxFFBValue:N3}");
 
         // Draw header
         g.DrawString(gameStateText.ToString(), SystemFonts.DefaultFont, brush, currX, currY);
@@ -785,7 +785,8 @@ namespace rF2SMMonitor
           + "Scoring:\n"
           + "Rules:\n"
           + "Extended:\n"
-          + "Avg read:");
+          + "Avg read:"
+          );
 
         g.DrawString(gameStateText.ToString(), SystemFonts.DefaultFont, Brushes.Black, 1500, 570);
 
@@ -810,7 +811,9 @@ namespace rF2SMMonitor
             + "Last LSI Phase:\n"
             + "Last LSI Pit:\n"
             + "Last LSI Order:\n"
-            + "Last SCR Instr.:\n");
+            + "Last SCR Instr.:\n"
+            + "SC Speed:\n"
+            );
 
           g.DrawString(gameStateText.ToString(), SystemFonts.DefaultFont, Brushes.Purple, 1500, 640);
 
@@ -822,7 +825,9 @@ namespace rF2SMMonitor
             + MainForm.GetStringFromBytes(this.extended.mLSIPhaseMessage) + '\n'
             + MainForm.GetStringFromBytes(this.extended.mLSIPitStateMessage) + '\n'
             + MainForm.GetStringFromBytes(this.extended.mLSIOrderInstructionMessage) + '\n'
-            + MainForm.GetStringFromBytes(this.extended.mLSIRulesInstructionMessage) + '\n');
+            + MainForm.GetStringFromBytes(this.extended.mLSIRulesInstructionMessage) + '\n'
+            + $"{this.extended.mSCSpeedMS:N3}\n"
+            );
 
           g.DrawString(gameStateText.ToString(), SystemFonts.DefaultFont, Brushes.Purple, 1580, 640);
 
@@ -834,7 +839,8 @@ namespace rF2SMMonitor
             + "updated: " + this.extended.mTicksLSIPhaseMessageUpdated + '\n'
             + "updated: " + this.extended.mTicksLSIPitStateMessageUpdated + '\n'
             + "updated: " + this.extended.mTicksLSIOrderInstructionMessageUpdated + '\n'
-            + "updated: " + this.extended.mTicksLSIRulesInstructionMessageUpdated + '\n');
+            + "updated: " + this.extended.mTicksLSIRulesInstructionMessageUpdated + '\n'
+            + '\n');
 
 
           g.DrawString(gameStateText.ToString(), SystemFonts.DefaultFont, Brushes.Purple, 1800, 640);

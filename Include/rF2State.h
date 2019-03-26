@@ -905,6 +905,8 @@ struct rF2Extended : public rF2MappedBufferHeader
 
   ULONGLONG mTicksLSIRulesInstructionMessageUpdated;     // Ticks when last FCY rules message was updated.  Currently, only SCR plugin sets that.
   char mLSIRulesInstructionMessage[rF2MappedBufferHeader::MAX_RULES_INSTRUCTION_MSG_LEN];
+
+  float mSCSpeedMS;  // Current SC speed.  Valid only when session is started.  If SC is not present, value is 999999.0f
 };
 
 #pragma pack(pop)
