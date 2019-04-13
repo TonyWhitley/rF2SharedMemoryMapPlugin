@@ -98,8 +98,8 @@ bool DirectMemoryReader::Read(rF2Extended& extended)
       assert(false && "DMR not available, should not call.");
       return false;
     }
-
-    if (strcmp(mPrevStatusMessage, mpStatusMessage) != 0) {
+    return false;
+    if (strncmp(mPrevStatusMessage, mpStatusMessage, rF2MappedBufferHeader::MAX_STATUS_MSG_LEN) != 0) {
       strcpy_s(extended.mStatusMessage, mpStatusMessage);
       strcpy_s(mPrevStatusMessage, extended.mStatusMessage);
       extended.mTicksStatusMessageUpdated = ::GetTickCount64();
@@ -151,10 +151,10 @@ bool DirectMemoryReader::Read(rF2Extended& extended)
           }
         }
 
-        auto const pMsg = !seenSplit ? pCurr : msgBuff;
+        /*auto const pMsg = !seenSplit ? pCurr : msgBuff;
         assert(pMsg != nullptr);
 
-        if (strcmp(mPrevLastHistoryMessage, pMsg) != 0) {
+        if (pMsg != nullptr && strncmp(mPrevLastHistoryMessage, pMsg, rF2MappedBufferHeader::MAX_STATUS_MSG_LEN) != 0) {
           strcpy_s(extended.mLastHistoryMessage, pMsg);
           strcpy_s(mPrevLastHistoryMessage, extended.mLastHistoryMessage);
           extended.mTicksLastHistoryMessageUpdated = ::GetTickCount64();
@@ -163,8 +163,8 @@ bool DirectMemoryReader::Read(rF2Extended& extended)
             DEBUG_MSG2(DebugLevel::DevInfo, "Last history message updated: ", extended.mLastHistoryMessage);
           else
             DEBUG_MSG2(DebugLevel::DevInfo, "Last history message updated (concatenated): ", extended.mLastHistoryMessage);
-
-        }
+            
+        }*/
 
         break;
       }
@@ -176,7 +176,6 @@ bool DirectMemoryReader::Read(rF2Extended& extended)
     DEBUG_MSG(DebugLevel::Errors, "ERROR: Exception while reading memory, disabling DMA.");
     return false;
   }
-
 
   return true;
 }
@@ -209,12 +208,13 @@ bool DirectMemoryReader::ReadOnLSIVisible(rF2Extended& extended)
       assert(false && "DMR not available, should not call.");
       return false;
     }
+    return false;
 
     auto const pPhase = mpLSIMessages + 0x50uLL;
     assert(pPhase != nullptr);
 
-    if (pPhase[0] != '\0' 
-      && strcmp(mPrevLSIPhaseMessage, pPhase) != 0) {
+    if (pPhase != nullptr && pPhase[0] != '\0'
+      && strncmp(mPrevLSIPhaseMessage, pPhase, rF2MappedBufferHeader::MAX_RULES_INSTRUCTION_MSG_LEN) != 0) {
       strcpy_s(extended.mLSIPhaseMessage, pPhase);
       strcpy_s(mPrevLSIPhaseMessage, extended.mLSIPhaseMessage);
       extended.mTicksLSIPhaseMessageUpdated = ::GetTickCount64();
@@ -225,8 +225,8 @@ bool DirectMemoryReader::ReadOnLSIVisible(rF2Extended& extended)
     auto const pPitState = mpLSIMessages + 0xD0uLL;
     assert(pPitState != nullptr);
 
-    if (pPitState[0] != '\0'
-      && strcmp(mPrevLSIPitStateMessage, pPitState) != 0) {
+    if (pPitState != nullptr && pPitState[0] != '\0'
+      && strncmp(mPrevLSIPitStateMessage, pPitState, rF2MappedBufferHeader::MAX_RULES_INSTRUCTION_MSG_LEN) != 0) {
       strcpy_s(extended.mLSIPitStateMessage, pPitState);
       strcpy_s(mPrevLSIPitStateMessage, extended.mLSIPitStateMessage);
       extended.mTicksLSIPitStateMessageUpdated = ::GetTickCount64();
@@ -237,8 +237,8 @@ bool DirectMemoryReader::ReadOnLSIVisible(rF2Extended& extended)
     auto const pOrderInstruction = mpLSIMessages + 0x150uLL;
     assert(pOrderInstruction != nullptr);
 
-    if (pOrderInstruction[0] != '\0'
-      && strcmp(mPrevLSIOrderInstructionMessage, pOrderInstruction) != 0) {
+    if (pOrderInstruction != nullptr && pOrderInstruction[0] != '\0'
+      && strncmp(mPrevLSIOrderInstructionMessage, pOrderInstruction, rF2MappedBufferHeader::MAX_RULES_INSTRUCTION_MSG_LEN) != 0) {
       strcpy_s(extended.mLSIOrderInstructionMessage, pOrderInstruction);
       strcpy_s(mPrevLSIOrderInstructionMessage, extended.mLSIOrderInstructionMessage);
       extended.mTicksLSIOrderInstructionMessageUpdated = ::GetTickCount64();
@@ -251,7 +251,7 @@ bool DirectMemoryReader::ReadOnLSIVisible(rF2Extended& extended)
 
     if (mSCRPluginEnabled
       && pRulesInstruction[0] != '\0'
-      && strcmp(mPrevLSIRulesInstructionMessage, pRulesInstruction) != 0) {
+      && strncmp(mPrevLSIRulesInstructionMessage, pRulesInstruction, rF2MappedBufferHeader::MAX_RULES_INSTRUCTION_MSG_LEN) != 0) {
       strcpy_s(extended.mLSIRulesInstructionMessage, pRulesInstruction);
       strcpy_s(mPrevLSIRulesInstructionMessage, extended.mLSIRulesInstructionMessage);
       extended.mTicksLSIRulesInstructionMessageUpdated = ::GetTickCount64();
@@ -343,6 +343,7 @@ void DirectMemoryReader::ReadSCRPluginConfigValues(char* const configFileContent
 
 void DirectMemoryReader::ClearLSIValues(rF2Extended& extended)
 {
+  return;
   DEBUG_MSG(DebugLevel::DevInfo, "Clearing LSI values.");
 
   mPrevLSIPhaseMessage[0] = '\0';
