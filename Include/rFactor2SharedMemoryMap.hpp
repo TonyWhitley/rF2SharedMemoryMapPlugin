@@ -291,6 +291,11 @@ public:
 
   // HW Control- action a control within the game
   bool HasHardwareInputs() { return(true); }
+  float mET;  // needed for the CheckHWControl demo
+
+  void UpdateHardware(const double fDT) { mET += fDT; } // update the hardware with the time between frames
+  void EnableHardware() { mEnabled = true; }           // message from game to enable hardware
+  void DisableHardware() { mEnabled = false; }         // message from game to disable hardware
   bool CheckHWControl(const char* const controlName, double& fRetVal) override;
 
 private:
@@ -313,6 +318,7 @@ private:
 
   template <typename BuffT>
   void TraceBeginUpdate(BuffT const& buffer, double& lastUpdateMillis, char const msgPrefix[]) const;
+  bool mEnabled; // needed for the CheckHWControl demo
 
 #ifdef UNITTEST // Make private methods available to unit test
 public:

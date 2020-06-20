@@ -252,3 +252,5 @@ paket-files/
 /VS2019
 /CheckHWControl_listSorted.txt
 /CheckHWControl_list.txt
+/controllerBindings.txt
+/controllerBindingsNames.txt

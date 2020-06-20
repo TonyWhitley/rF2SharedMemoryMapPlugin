@@ -1132,7 +1132,7 @@ bool SharedMemoryPlugin::AccessPitMenu(PitMenuV01& info)
 
   mPitMenu.BeginUpdate();
   // Copy main struct.
-  memcpy(mPitMenu.mpBuff, &info, sizeof(rF2PitMenu));
+  /////////////memcpy(mPitMenu.mpBuff, &info, sizeof(rF2PitMenu));
 
   // Proof of concept - send changes in the Pit Menu contents to the debug stream
   if (category != info.mCategoryIndex)
@@ -1174,6 +1174,17 @@ bool SharedMemoryPlugin::AccessPitMenu(PitMenuV01& info)
 // NOTE: doesn't do anything if the AI is driving
 
 // Only called if rFactor2SharedMemoryMap.hpp HasHardwareInputs() returns true
+
+// 'ToggleMFDA'	Leaderboard
+// 'ToggleMFDB'	Pit menu
+// 'ToggleMFDC'	Tyres
+// 'ToggleMFDD'	Driver aids
+// 'ToggleMFDE'	RPM / Water / Oil etc.
+// 'ToggleMFDF'	Clock
+// 'ToggleMFDG'	Penalties
+// 'ToggleMFDH'	Current / Sectors
+
+
 bool SharedMemoryPlugin::CheckHWControl(const char* const controlName, double& fRetVal)
 {
   // DEBUG_MSG(DebugLevel::DevInfo, "CheckHWControl called");
@@ -1209,56 +1220,71 @@ bool SharedMemoryPlugin::CheckHWControl(const char* const controlName, double& f
   }
   // Hack test - operate Pit Menu
   const double headSwitcheroo = fmod(mET, 2.0);
-  if (_stricmp(controlName, "PitMenuIncrementValue") == 0)
+  if (_stricmp(controlName, "ToggleMFDB") == 0)
   {
-    if (headSwitcheroo < 0.5)
+    //DEBUG_MSG(DebugLevel::DevInfo, "ToggleMFDB match");
+    if ((headSwitcheroo > 1.0) && (headSwitcheroo < 1.5))
     {
       fRetVal = 1.0;
-      DEBUG_MSG(DebugLevel::DevInfo, "PitMenuIncrementValue 1");
+      //DEBUG_MSG(DebugLevel::DevInfo, "ToggleMFDB 1");
     }
     else
       fRetVal = 0.0;
     return(true);
   }
-  else if (_stricmp(controlName, "PitMenuDecrementValue") == 0)
+  else if (false)
   {
-    DEBUG_MSG(DebugLevel::DevInfo, "PitMenuDecrementValue match");
-    if ((headSwitcheroo > 1.0) && (headSwitcheroo < 1.5))
+    if (_stricmp(controlName, "PitMenuIncrementValue") == 0)
     {
-      fRetVal = 1.0;
-      DEBUG_MSG(DebugLevel::DevInfo, "PitMenuDecrementValue 1");
+      if (headSwitcheroo < 0.5)
+      {
+        fRetVal = 1.0;
+        DEBUG_MSG(DebugLevel::DevInfo, "PitMenuIncrementValue 1");
+      }
+      else
+        fRetVal = 0.0;
+      return(true);
     }
-    else
-      fRetVal = 0.0;
-    return(true);
-  }
-  else if (_stricmp(controlName, "PitMenuUp") == 0)
-  {
-    if ((headSwitcheroo > 1.0) && (headSwitcheroo < 1.5))
-      fRetVal = 1.0;
-    else
-      fRetVal = 0.0;
-    return(true);
-  }
-  else if (_stricmp(controlName, "PitMenuDown") == 0)
-  {
-    if ((headSwitcheroo > 1.0) && (headSwitcheroo < 1.5))
-      fRetVal = 1.0;
-    else
-      fRetVal = 0.0;
-    return(true);
-  }
-  else if (_stricmp(controlName, "DisplayMode") == 0)
-  {
-    DEBUG_MSG(DebugLevel::DevInfo, "DisplayMode match");
-    if ((headSwitcheroo > 1.0) && (headSwitcheroo < 1.5))
+    else if (_stricmp(controlName, "PitMenuDecrementValue") == 0)
     {
-      fRetVal = 1.0;
-      DEBUG_MSG(DebugLevel::DevInfo, "DisplayMode 1");
+      DEBUG_MSG(DebugLevel::DevInfo, "PitMenuDecrementValue match");
+      if ((headSwitcheroo > 1.0) && (headSwitcheroo < 1.5))
+      {
+        fRetVal = 1.0;
+        DEBUG_MSG(DebugLevel::DevInfo, "PitMenuDecrementValue 1");
+      }
+      else
+        fRetVal = 0.0;
+      return(true);
     }
-    else
-      fRetVal = 0.0;
-    return(true);
+    else if (_stricmp(controlName, "PitMenuUp") == 0)
+    {
+      if ((headSwitcheroo > 1.0) && (headSwitcheroo < 1.5))
+        fRetVal = 1.0;
+      else
+        fRetVal = 0.0;
+      return(true);
+    }
+    else if (_stricmp(controlName, "PitMenuDown") == 0)
+    {
+      if ((headSwitcheroo > 1.0) && (headSwitcheroo < 1.5))
+        fRetVal = 1.0;
+      else
+        fRetVal = 0.0;
+      return(true);
+    }
+    else if (_stricmp(controlName, "DisplayMode") == 0)
+    {
+      DEBUG_MSG(DebugLevel::DevInfo, "DisplayMode match");
+      if ((headSwitcheroo > 1.0) && (headSwitcheroo < 1.5))
+      {
+        fRetVal = 1.0;
+        DEBUG_MSG(DebugLevel::DevInfo, "DisplayMode 1");
+      }
+      else
+        fRetVal = 0.0;
+      return(true);
+    }
   }
   ///////////////////////////////////////////////////////////
   // ISI comments:
