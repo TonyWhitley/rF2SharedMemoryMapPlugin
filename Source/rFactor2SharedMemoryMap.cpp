@@ -132,6 +132,8 @@ char const* const SharedMemoryPlugin::MM_GRAPHICS_FILE_NAME = "$rFactor2SMMP_Gra
 char const* const SharedMemoryPlugin::MM_EXTENDED_FILE_NAME = "$rFactor2SMMP_Extended$";
 char const* const SharedMemoryPlugin::MM_PIT_MENU_FILE_NAME = "$rFactor2SMMP_PitMenu$";
 
+char const* const SharedMemoryPlugin::MM_HWCONTROL_FILE_NAME = "$rFactor2SMMP_HWControl$";
+
 char const* const SharedMemoryPlugin::INTERNALS_TELEMETRY_FILENAME = R"(UserData\Log\RF2SMMP_InternalsTelemetryOutput.txt)";
 char const* const SharedMemoryPlugin::INTERNALS_SCORING_FILENAME = R"(UserData\Log\RF2SMMP_InternalsScoringOutput.txt)";
 char const* const SharedMemoryPlugin::INTERNALS_PITMENU_FILENAME = R"(UserData\Log\RF2SMMP_InternalsPitMenuOutput.txt)";
@@ -176,7 +178,8 @@ SharedMemoryPlugin::SharedMemoryPlugin()
     , mForceFeedback(SharedMemoryPlugin::MM_FORCE_FEEDBACK_FILE_NAME)
     , mGraphics(SharedMemoryPlugin::MM_GRAPHICS_FILE_NAME)
     , mExtended(SharedMemoryPlugin::MM_EXTENDED_FILE_NAME)
-    , mPitMenu(SharedMemoryPlugin::MM_PIT_MENU_FILE_NAME)
+    , mPitInfo(SharedMemoryPlugin::MM_PIT_MENU_FILE_NAME)
+    , mHWControl(SharedMemoryPlugin::MM_HWCONTROL_FILE_NAME)
 {
   memset(mParticipantTelemetryUpdated, 0, sizeof(mParticipantTelemetryUpdated));
 }
@@ -263,8 +266,13 @@ void SharedMemoryPlugin::Startup(long version)
     return;
   }
 
-  if (!mPitMenu.Initialize(SharedMemoryPlugin::msDedicatedServerMapGlobally)) {
+  if (!mPitInfo.Initialize(SharedMemoryPlugin::msDedicatedServerMapGlobally)) {
     DEBUG_MSG(DebugLevel::Errors, "Failed to initialize Pit Menu mapping");
+    return;
+  }
+
+  if (!mHWControl.Initialize(SharedMemoryPlugin::msDedicatedServerMapGlobally)) {
+    DEBUG_MSG(DebugLevel::Errors, "Failed to initialize HWControl mapping");
     return;
   }
 
@@ -395,8 +403,8 @@ void SharedMemoryPlugin::Shutdown()
   mExtended.ClearState(nullptr /*pInitialContents*/);
   mExtended.ReleaseResources();
 
-  mPitMenu.ClearState(nullptr /*pInitialContents*/);
-  mPitMenu.ReleaseResources();
+  mPitInfo.ClearState(nullptr /*pInitialContents*/);
+  mPitInfo.ReleaseResources();
 
 }
 
@@ -438,7 +446,7 @@ void SharedMemoryPlugin::ClearState()
   // So, clear the state but pass persisting state as initial state.
   mExtStateTracker.ClearState();
   mExtended.ClearState(&(mExtStateTracker.mExtended));
-  mPitMenu.ClearState(nullptr /*pInitialContents*/);
+  mPitInfo.ClearState(nullptr /*pInitialContents*/);
 
   ClearTimingsAndCounters();
 }
@@ -1128,29 +1136,29 @@ bool SharedMemoryPlugin::AccessPitMenu(PitMenuV01& info)
     return false;
 
   // gets here DEBUG_MSG(DebugLevel::DevInfo, "AccessPitMenu mIsMapped");
-  TraceBeginUpdate(mPitMenu, mLastPitMenuUpdateMillis, "PIT UPDATE");
+  TraceBeginUpdate(mPitInfo, mLastPitMenuUpdateMillis, "PIT UPDATE");
 
-  mPitMenu.BeginUpdate();
+  mPitInfo.BeginUpdate();
   // Copy main struct.
-  /////////////memcpy(mPitMenu.mpBuff, &info, sizeof(rF2PitMenu));
+  /////////////memcpy(mPitInfo.mpBuff, &info, sizeof(rF2PitMenu));
 
   // Proof of concept - send changes in the Pit Menu contents to the debug stream
   if (category != info.mCategoryIndex)
   {
     category = info.mCategoryIndex;
-    mPitMenu.mpBuff->changed = true;
+    mPitInfo.mpBuff->changed = true;
     // this works
     DEBUG_MSG2(DebugLevel::DevInfo, "Pit menu category changed:", info.mCategoryName);
   }
   if (choice != info.mChoiceIndex)
   {
     choice = info.mChoiceIndex;
-    mPitMenu.mpBuff->changed = true;
+    mPitInfo.mpBuff->changed = true;
     // this works
     DEBUG_MSG2(DebugLevel::DevInfo, "Pit menu choice changed:", info.mChoiceString);
   }
 
-  mPitMenu.EndUpdate();
+  mPitInfo.EndUpdate();
 
   return false;
 }
@@ -1192,100 +1200,6 @@ bool SharedMemoryPlugin::CheckHWControl(const char* const controlName, double& f
   if (false) // TBD process to disable HW control
     return(false);
 
-  /*
-  // Hack test - flash the headlights
-  // Doesn't work, presumably because it's an "actual vehicle input"? Confirmed by Lazza.
-  // ** Sorry, no control allowed over actual vehicle inputs ... would be too easy to cheat! **
-  if (_stricmp(controlName, "Headlights") == 0)
-  {
-    const float headSwitcheroo = fmodf(mET, 2.0f);
-    if (headSwitcheroo < 0.5)
-    {
-      fRetVal = 1.0f;
-      // we get here DEBUG_MSG(DebugLevel::DevInfo, "Headlight control 01");
-
-    }
-    else
-    {
-      fRetVal = 0.0f;
-      //DEBUG_MSG(DebugLevel::DevInfo, "Headlight control 00");
-    }
-    return(true);
-  }
-  */
-
-  if (_stricmp(controlName, "PitDisplay") == 0)
-  {
-    DEBUG_MSG(DebugLevel::DevInfo, "PitDisplay match"); // Doesn't happen
-  }
-  // Hack test - operate Pit Menu
-  const double headSwitcheroo = fmod(mET, 2.0);
-  if (_stricmp(controlName, "ToggleMFDB") == 0)
-  {
-    //DEBUG_MSG(DebugLevel::DevInfo, "ToggleMFDB match");
-    if ((headSwitcheroo > 1.0) && (headSwitcheroo < 1.5))
-    {
-      fRetVal = 1.0;
-      //DEBUG_MSG(DebugLevel::DevInfo, "ToggleMFDB 1");
-    }
-    else
-      fRetVal = 0.0;
-    return(true);
-  }
-  else if (false)
-  {
-    if (_stricmp(controlName, "PitMenuIncrementValue") == 0)
-    {
-      if (headSwitcheroo < 0.5)
-      {
-        fRetVal = 1.0;
-        DEBUG_MSG(DebugLevel::DevInfo, "PitMenuIncrementValue 1");
-      }
-      else
-        fRetVal = 0.0;
-      return(true);
-    }
-    else if (_stricmp(controlName, "PitMenuDecrementValue") == 0)
-    {
-      DEBUG_MSG(DebugLevel::DevInfo, "PitMenuDecrementValue match");
-      if ((headSwitcheroo > 1.0) && (headSwitcheroo < 1.5))
-      {
-        fRetVal = 1.0;
-        DEBUG_MSG(DebugLevel::DevInfo, "PitMenuDecrementValue 1");
-      }
-      else
-        fRetVal = 0.0;
-      return(true);
-    }
-    else if (_stricmp(controlName, "PitMenuUp") == 0)
-    {
-      if ((headSwitcheroo > 1.0) && (headSwitcheroo < 1.5))
-        fRetVal = 1.0;
-      else
-        fRetVal = 0.0;
-      return(true);
-    }
-    else if (_stricmp(controlName, "PitMenuDown") == 0)
-    {
-      if ((headSwitcheroo > 1.0) && (headSwitcheroo < 1.5))
-        fRetVal = 1.0;
-      else
-        fRetVal = 0.0;
-      return(true);
-    }
-    else if (_stricmp(controlName, "DisplayMode") == 0)
-    {
-      DEBUG_MSG(DebugLevel::DevInfo, "DisplayMode match");
-      if ((headSwitcheroo > 1.0) && (headSwitcheroo < 1.5))
-      {
-        fRetVal = 1.0;
-        DEBUG_MSG(DebugLevel::DevInfo, "DisplayMode 1");
-      }
-      else
-        fRetVal = 0.0;
-      return(true);
-    }
-  }
   ///////////////////////////////////////////////////////////
   // ISI comments:
   // Note that incoming value is the game's computation, in case you're interested.
@@ -1300,16 +1214,24 @@ bool SharedMemoryPlugin::CheckHWControl(const char* const controlName, double& f
   // I suggest that a simple hash function might be more efficient, especially
   // if only a limited set of controls is provided (most of them seem of little use)
 
-  if (_stricmp(controlName, ControlToAction) == 0)
+  if (mHWControl.CheckReadBuffer())
   {
-    ControlToAction = "";
-    fRetVal = 1.0f; // I can't remember what that does
-    DEBUG_MSG2(DebugLevel::DevInfo, controlName, " actioned");
-    return(true);
+    if (_stricmp(controlName, mHWControl.mpBuff->mControlName) == 0)
+    {
+      fRetVal = mHWControl.mpBuff->mfRetVal;
+      return(true);
+    }
   }
-
   return false;
 }
+
+// UNITTEST access fn
+void SharedMemoryPlugin::__SetHWControl(const char* const controlName, double fRetVal)
+{
+  strcpy(mHWControl.mpBuff->mControlName, (char *)controlName);
+  mHWControl.mpBuff->mfRetVal = fRetVal;
+}
+
 
 ////////////////////////////////////////////
 // Debug output helpers.

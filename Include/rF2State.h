@@ -963,4 +963,10 @@ struct rF2PitMenu : public rF2MappedBufferHeader
 
   unsigned char mExpansion[256-sizeof(changed)];      // for future use
 };
+
+struct rF2HWControl : public rF2MappedBufferHeader
+{
+  char mControlName[96];
+  double mfRetVal;
+};
 #pragma pack(pop)

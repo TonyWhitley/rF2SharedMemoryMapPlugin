@@ -116,11 +116,15 @@ namespace UnitTestMethods // startup code tested, now use it to test the rest
 
     TEST_METHOD(Test_CheckHWControl)
     {
-      double RetVal;
+      double RetVal = 1.0f;
 
+#define CONTROL_NAME "ToggleMFDB"
       TEST_NAME_IN_DEBUG("Test_CheckHWControl");
-      bool ret = smp_obj.CheckHWControl("Headlights", RetVal);
+      smp_obj.__SetHWControl(CONTROL_NAME, RetVal);
+      RetVal = 0.0f;
+      bool ret = smp_obj.CheckHWControl(CONTROL_NAME, RetVal);
       Assert::IsTrue(ret);
+      Assert::AreEqual(RetVal, (double)1.0f);
     }
 
     TEST_METHOD(Test_UpdateGraphics)
@@ -157,7 +161,7 @@ namespace UnitTestMethods // startup code tested, now use it to test the rest
       strcpy_s(info.mChoiceString, sizeof(info.mChoiceString), "CHOICE 1");
       TEST_NAME_IN_DEBUG("TestAccessPitMenu");
       smp_obj.AccessPitMenu(info);
-      Assert::IsTrue(smp_obj.mPitMenu.mpBuff->changed);
+      Assert::IsTrue(smp_obj.mPitInfo.mpBuff->changed);
     }
 
     TEST_METHOD(TestAccessPitMenu_Timing)
