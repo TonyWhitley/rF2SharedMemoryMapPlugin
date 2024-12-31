@@ -112,8 +112,7 @@ If ran in dedicated server process, each shared memory buffer name has server PI
 ## Distribution and reuse
 You are allowed to include this .dll with your distribution, as long as it is:
 * Free
-* Readme is included
-* You had my permission via email
+* This Readme is included
 
 Please also be aware, that Crew Chief will always ship with the latest version of the .dll and will overwrite .dll to match its version.  I do not expect compatibility to break without game changing its model, aside from `rF2Extended` buffer, which contains stuff not directly exposed by the game.  Every time layout of memory changes, either of the first two digits in the Plugin version is incremented, which means clients might need an update.  Monitor app is kept in sync with plugin.
 
