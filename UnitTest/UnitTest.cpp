@@ -13,7 +13,7 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 #define SMP_VERSION 3720
 #define TEST_NAME_IN_DEBUG(name) \
-    DEBUG_MSG(DebugLevel::DevInfo, "**** FROM UNIT TEST " ## name ## " ****")
+    DEBUG_MSG(DebugLevel::DevInfo, DebugSource::DMR, "**** FROM UNIT TEST " ## name ## " ****")
 
 namespace UnitTestStartup // Just test the startup code
 {
