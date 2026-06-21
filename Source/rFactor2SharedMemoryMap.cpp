@@ -1394,6 +1394,12 @@ bool SharedMemoryPlugin::CheckHWControl(char const* const controlName, double& f
   return false;
 }
 
+// UNITTEST access fn
+void SharedMemoryPlugin::__SetHWControl(const char* const controlName, double fRetVal)
+{
+  strcpy(mHWControl.mReadBuff.mControlName, (char*)controlName);
+  mHWControl.mReadBuff.mfRetVal = fRetVal;
+}
 
 // Invoked at 1FPS.
 bool SharedMemoryPlugin::AccessWeather(double trackNodeSize, WeatherControlInfoV01& info)

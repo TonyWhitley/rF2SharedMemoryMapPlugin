@@ -1297,7 +1297,7 @@
       <OutputFile>.\Debug/rFactor2SharedMemoryMapPlugin32.bsc</OutputFile>
     </Bscmake>
     <PostBuildEvent>
-      <Command>copy /y $(OutputPath)$(AssemblyName)$(PlatformArchitecture)t.dll  "d:\games\SteamLibrary\steamapps\common\rFactor\Plugins"</Command>
+      <Command>rem copy /y $(OutputPath)$(AssemblyName)$(PlatformArchitecture)t.dll  "d:\games\SteamLibrary\steamapps\common\rFactor\Plugins"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -1346,7 +1346,7 @@
       </Command>
     </CustomBuildStep>
     <PostBuildEvent>
-      <Command>copy /y $(OutputPath)$(AssemblyName)$(PlatformArchitecture).dll  "$(ProgramFiles)\Steam\steamapps\common\rFactor 2\Bin64\Plugins"</Command>
+      <Command>rem copy /y $(OutputPath)$(AssemblyName)$(PlatformArchitecture).dll  "$(ProgramFiles)\Steam\steamapps\common\rFactor 2\Bin64\Plugins"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='UnitTest|x64'">
@@ -1395,7 +1395,7 @@
       </Command>
     </CustomBuildStep>
     <PostBuildEvent>
-      <Command>copy /y $(OutputPath)$(AssemblyName)$(PlatformArchitecture).dll  "$(ProgramFiles)\Steam\steamapps\common\rFactor 2\Bin64\Plugins"</Command>
+      <Command>rem copy /y $(OutputPath)$(AssemblyName)$(PlatformArchitecture).dll  "$(ProgramFiles)\Steam\steamapps\common\rFactor 2\Bin64\Plugins"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

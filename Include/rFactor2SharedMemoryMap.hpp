@@ -159,7 +159,7 @@ public:
   static void WriteScoringInternals(ScoringInfoV01 const& info);
   static void TraceLastWin32Error();
 
-private:
+public:
   class ExtendedStateTracker
   {
   public:
@@ -324,6 +324,8 @@ public:
   }
 
   bool CheckHWControl(char const* const controlName, double& fRetVal) override;
+  // UNITTEST access fn
+  void __SetHWControl(const char* const controlName, double fRetVal);
 
   // CONDITIONS CONTROL
   bool WantsWeatherAccess() override { return Utils::IsFlagOff(SharedMemoryPlugin::msUnsubscribedBuffersMask, SubscribedBuffer::Weather); } // change to true in order to read or write weather with AccessWeather() call:
@@ -366,7 +368,7 @@ private:
   template <typename BuffT>
   void TraceBeginUpdate(BuffT const& buffer, double& lastUpdateMillis, char const msgPrefix[]) const;
 
-private:
+public:
   // Only used for debugging in Timing level
   double mLastTelemetryUpdateMillis = 0.0;
   double mLastTelemetryVehicleAddedMillis = 0.0;

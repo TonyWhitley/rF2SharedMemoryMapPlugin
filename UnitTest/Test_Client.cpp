@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "CppUnitTest.h"
 #include <direct.h>
-#include "rFactor2SharedMemoryMap.hpp"
+#include "..\Include\rFactor2SharedMemoryMap.hpp"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
