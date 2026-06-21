@@ -1,3 +1,10 @@
+/*
+Original ISI V7 internals dump code, tweaked to use buffered output and to match overall
+code stlye of the rf2sm plugin.
+
+Author: ISI
+*/
+
 #include "rFactor2SharedMemoryMap.hpp"
 
 
@@ -177,28 +184,4 @@ void SharedMemoryPlugin::WriteScoringInternals(ScoringInfoV01 const& info)
     // Close file
     fclose(fo);
   }
-}
-
-void SharedMemoryPlugin::WritePitMenuInternals(PitMenuV01 const& info)
-{
-  if (!SharedMemoryPlugin::msDebugISIInternals)
-    return;
-
-  if (SharedMemoryPlugin::msIsiPitMenuFile == nullptr) {
-    SharedMemoryPlugin::msIsiPitMenuFile = _fsopen(SharedMemoryPlugin::INTERNALS_PITMENU_FILENAME, "a", _SH_DENYNO);
-    setvbuf(SharedMemoryPlugin::msIsiPitMenuFile, nullptr, _IOFBF, SharedMemoryPlugin::BUFFER_IO_BYTES);
-  }
-
-  auto fo = SharedMemoryPlugin::msIsiPitMenuFile;
-  if (fo != nullptr)
-  {
-    fprintf(fo, "mCategoryIndex=%ld  ", info.mCategoryIndex);
-    fprintf(fo, "mCategoryName='%s'\n", info.mCategoryName);
-    fprintf(fo, "mChoiceIndex=%ld  ", info.mChoiceIndex);
-    fprintf(fo, "mChoiceString='%s'\n", info.mChoiceString);
-    // Close file
-    DEBUG_MSG(DebugLevel::DevInfo, "WritePitMenuInternals");
-    fclose(fo);
-  }
-
 }
