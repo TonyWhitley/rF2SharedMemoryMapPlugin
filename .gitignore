@@ -257,3 +257,5 @@ paket-files/
 /UnitTest/pch.h
 /UnitTest/pch.cpp
 /Monitor/rF2SMMonitor/rF2SMMonitor/MainForm.cs.new
+/CheckHWControl_listSorted.txt
+/CheckHWControl_list.txt
