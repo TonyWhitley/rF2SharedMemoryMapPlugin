@@ -1,8 +1,3 @@
-// String literals to build the shared-memory prefix
-#define CLIENT_NAME "CrewChief"
-#define GAME_NAME   "rF2"
-#define MM_PREFIX   "$" CLIENT_NAME "." GAME_NAME
-
 /*
 Implementation of rFactor 2 internal state mapping into shared memory buffers.
 
@@ -175,25 +170,26 @@ FILE* SharedMemoryPlugin::msDebugFile;
 FILE* SharedMemoryPlugin::msIsiTelemetryFile;
 FILE* SharedMemoryPlugin::msIsiScoringFile;
 
-// Replace hardcoded names with prefix-based names so "$CrewChief.rF2" derives from CLIENT/GAME
-char const* const SharedMemoryPlugin::MM_TELEMETRY_FILE_NAME = MM_PREFIX ".SMMP_Telemetry$";
-char const* const SharedMemoryPlugin::MM_SCORING_FILE_NAME = MM_PREFIX ".SMMP_Scoring$";
-char const* const SharedMemoryPlugin::MM_RULES_FILE_NAME = MM_PREFIX ".SMMP_Rules$";
-char const* const SharedMemoryPlugin::MM_MULTI_RULES_FILE_NAME = MM_PREFIX ".SMMP_MultiRules$";
-char const* const SharedMemoryPlugin::MM_FORCE_FEEDBACK_FILE_NAME = MM_PREFIX ".SMMP_ForceFeedback$";
-char const* const SharedMemoryPlugin::MM_GRAPHICS_FILE_NAME = MM_PREFIX ".SMMP_Graphics$";
-char const* const SharedMemoryPlugin::MM_EXTENDED_FILE_NAME = MM_PREFIX ".SMMP_Extended$";
-char const* const SharedMemoryPlugin::MM_PIT_INFO_FILE_NAME = MM_PREFIX ".SMMP_PitInfo$";
-char const* const SharedMemoryPlugin::MM_WEATHER_FILE_NAME = MM_PREFIX ".SMMP_Weather$";
+// Replace hardcoded names with prefix-based names so "rF2.3.80." derives from GAME PLUGIN_VERSION_MAJOR
+#define MM_PREFIX   "$" GAME_NAME "." PLUGIN_VERSION_MAJOR "."
+char const* const SharedMemoryPlugin::MM_TELEMETRY_FILE_NAME = MM_PREFIX "SMMP_Telemetry$";
+char const* const SharedMemoryPlugin::MM_SCORING_FILE_NAME = MM_PREFIX "SMMP_Scoring$";
+char const* const SharedMemoryPlugin::MM_RULES_FILE_NAME = MM_PREFIX "SMMP_Rules$";
+char const* const SharedMemoryPlugin::MM_MULTI_RULES_FILE_NAME = MM_PREFIX "SMMP_MultiRules$";
+char const* const SharedMemoryPlugin::MM_FORCE_FEEDBACK_FILE_NAME = MM_PREFIX "SMMP_ForceFeedback$";
+char const* const SharedMemoryPlugin::MM_GRAPHICS_FILE_NAME = MM_PREFIX "SMMP_Graphics$";
+char const* const SharedMemoryPlugin::MM_EXTENDED_FILE_NAME = MM_PREFIX "SMMP_Extended$";
+char const* const SharedMemoryPlugin::MM_PIT_INFO_FILE_NAME = MM_PREFIX "SMMP_PitInfo$";
+char const* const SharedMemoryPlugin::MM_WEATHER_FILE_NAME = MM_PREFIX "SMMP_Weather$";
 
-char const* const SharedMemoryPlugin::MM_HWCONTROL_FILE_NAME = MM_PREFIX ".SMMP_HWControl$";
-char const* const SharedMemoryPlugin::MM_WEATHER_CONTROL_FILE_NAME = MM_PREFIX ".SMMP_WeatherControl$";
-char const* const SharedMemoryPlugin::MM_RULES_CONTROL_FILE_NAME = MM_PREFIX ".SMMP_RulesControl$";
-char const* const SharedMemoryPlugin::MM_PLUGIN_CONTROL_FILE_NAME = MM_PREFIX ".SMMP_PluginControl$";
+char const* const SharedMemoryPlugin::MM_HWCONTROL_FILE_NAME = MM_PREFIX "SMMP_HWControl$";
+char const* const SharedMemoryPlugin::MM_WEATHER_CONTROL_FILE_NAME = MM_PREFIX "SMMP_WeatherControl$";
+char const* const SharedMemoryPlugin::MM_RULES_CONTROL_FILE_NAME = MM_PREFIX "SMMP_RulesControl$";
+char const* const SharedMemoryPlugin::MM_PLUGIN_CONTROL_FILE_NAME = MM_PREFIX "SMMP_PluginControl$";
 
-char const* const SharedMemoryPlugin::INTERNALS_TELEMETRY_FILENAME = R"(UserData\Log\RF2SMMP_InternalsTelemetryOutput.txt)";
-char const* const SharedMemoryPlugin::INTERNALS_SCORING_FILENAME = R"(UserData\Log\RF2SMMP_InternalsScoringOutput.txt)";
-char const* const SharedMemoryPlugin::DEBUG_OUTPUT_FILENAME = R"(UserData\Log\RF2SMMP_DebugOutput.txt)";
+char const* const SharedMemoryPlugin::INTERNALS_TELEMETRY_FILENAME = R"(UserData\Log\" GAME_NAME "SMMP_InternalsTelemetryOutput.txt)";
+char const* const SharedMemoryPlugin::INTERNALS_SCORING_FILENAME = R"(UserData\Log\" GAME_NAME "SMMP_InternalsScoringOutput.txt)";
+char const* const SharedMemoryPlugin::DEBUG_OUTPUT_FILENAME = R"(UserData\Log\" GAME_NAME "SMMP_DebugOutput.txt)";
 
 // plugin information
 extern "C" __declspec(dllexport)
@@ -286,12 +282,12 @@ void SharedMemoryPlugin::Startup(long version)
   // Print out configuration.
 #ifdef VERSION_AVX2
 #ifdef VERSION_MT
-  DEBUG_MSG(DebugLevel::CriticalInfo, DebugSource::General, "Starting rFactor 2 Shared Memory Map Plugin 64bit Version: %s", SHARED_MEMORY_VERSION " AVX2+PGO+MT");
+  DEBUG_MSG(DebugLevel::CriticalInfo, DebugSource::General, "Starting ", GAME_NAME, " Shared Memory Map Plugin 64bit Version: %s", SHARED_MEMORY_VERSION " AVX2+PGO+MT");
 #else
-  DEBUG_MSG(DebugLevel::CriticalInfo, DebugSource::General, "Starting rFactor 2 Shared Memory Map Plugin 64bit Version: %s", SHARED_MEMORY_VERSION " AVX2+PGO");
+  DEBUG_MSG(DebugLevel::CriticalInfo, DebugSource::General, "Starting ", GAME_NAME, " Shared Memory Map Plugin 64bit Version: %s", SHARED_MEMORY_VERSION " AVX2+PGO");
 #endif
 #else
-  DEBUG_MSG(DebugLevel::CriticalInfo, DebugSource::General, "Starting rFactor 2 Shared Memory Map Plugin 64bit Version: %s", SHARED_MEMORY_VERSION);
+  DEBUG_MSG(DebugLevel::CriticalInfo, DebugSource::General, "Starting ", GAME_NAME, " Shared Memory Map Plugin 64bit Version: %s", SHARED_MEMORY_VERSION);
 #endif
   DEBUG_MSG(DebugLevel::CriticalInfo, DebugSource::General, "Configuration:");
   DEBUG_MSG(DebugLevel::CriticalInfo, DebugSource::General, "DebugOutputLevel: %ld", SharedMemoryPlugin::msDebugOutputLevel);
