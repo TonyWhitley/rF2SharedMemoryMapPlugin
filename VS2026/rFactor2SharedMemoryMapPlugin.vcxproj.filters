@@ -36,6 +36,9 @@
     <Filter Include="includes">
       <UniqueIdentifier>{79e81626-698a-4723-adea-817fd98c4996}</UniqueIdentifier>
     </Filter>
+    <Filter Include="LMU">
+      <UniqueIdentifier>{5e16510e-17aa-42c4-a83a-ed6f52676463}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.gitignore" />
