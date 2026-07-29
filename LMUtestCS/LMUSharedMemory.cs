@@ -3,6 +3,8 @@ using System.IO;
 using System.Text;
 using System.Collections.Generic;
 
+using lmuSharedMemory.LMUData;
+
 // Field-accurate reader for key parts of the LMU shared-memory layout, modeled on CopySharedMemoryObj.
 // This reads the shared-memory bytes and returns a managed representation with copied arrays/buffers.
 static class LMUSharedMemory
@@ -18,6 +20,8 @@ static class LMUSharedMemory
         public SharedMemoryPathData paths = new SharedMemoryPathData();
         public SharedMemoryScoringDataManaged scoring = new SharedMemoryScoringDataManaged();
         public SharedMemoryTelemetryDataManaged telemetry = new SharedMemoryTelemetryDataManaged();
+        // Raw copy of the entire shared-memory object
+        public byte[] RawBytes = Array.Empty<byte>();
     }
 
     public class SharedMemoryGenericGeneric
@@ -40,7 +44,7 @@ static class LMUSharedMemory
 
     public class SharedMemoryScoringDataManaged
     {
-        public ScoringInfoManaged scoringInfo = new ScoringInfoManaged();
+        public rF2ScoringInfo scoringInfo = new rF2ScoringInfo();
         public int scoringStreamSize;
         public List<VehicleScoringManaged> vehScoringInfo = new List<VehicleScoringManaged>();
         public byte[] scoringStream = new byte[0];
@@ -112,13 +116,14 @@ static class LMUSharedMemory
             outObj.paths.pluginsFolder = ReadFixedAnsi(br, MAX_PATH);
 
             // ScoringInfoV01: read fields up to mNumVehicles then continue to end of struct
-            outObj.scoring.scoringInfo.trackName = ReadFixedAnsi(br, 64);
-            outObj.scoring.scoringInfo.session = br.ReadInt32();
-            outObj.scoring.scoringInfo.currentET = br.ReadDouble();
-            outObj.scoring.scoringInfo.endET = br.ReadDouble();
-            outObj.scoring.scoringInfo.maxLaps = br.ReadInt32();
-            outObj.scoring.scoringInfo.lapDist = br.ReadDouble();
-            // mResultsStream pointer (skip IntPtr)
+            //outObj.scoring.scoringInfo.mTrackName = ReadFixedAnsi(br, 64);
+            ReadFixedAnsi(br, 64); // skip
+            outObj.scoring.scoringInfo.mSession = br.ReadInt32();
+            outObj.scoring.scoringInfo.mCurrentET = br.ReadDouble();
+            outObj.scoring.scoringInfo.mEndET = br.ReadDouble();
+            outObj.scoring.scoringInfo.mMaxLaps = br.ReadInt32();
+            outObj.scoring.scoringInfo.mLapDist = br.ReadDouble();
+            //mResultsStream pointer (skip IntPtr)
             if (IntPtr.Size == 8) br.ReadInt64(); else br.ReadInt32();
             outObj.scoring.scoringInfo.mNumVehicles = br.ReadInt32();
             int mNumVehicles = outObj.scoring.scoringInfo.mNumVehicles;

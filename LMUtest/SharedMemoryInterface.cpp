@@ -91,9 +91,9 @@ int main(int argc, char* argv[])
 
     // Try to open a handle to the parent process with SYNCHRONIZE right.
     // SYNCHRONIZE is enough to wait on the process handle for exit.
-    HANDLE hParent = OpenProcess(SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION, FALSE, parentPid);
-    HANDLE hEvent = OpenEventA(SYNCHRONIZE, FALSE, "LMU_Data_Event");
-    HANDLE hMapFile = OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, L"$LMU.3.8.SMMP_Telemetry$"); //!!!!!!!!!!!!!!!!!!! L"LMU_Data");
+    hParent = OpenProcess(SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION, FALSE, parentPid);
+    hEvent = OpenEventA(SYNCHRONIZE, FALSE, "LMU_Data_Event");
+    hMapFile = OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, L"$LMU.3.8.SMMP_Telemetry$"); //!!!!!!!!!!!!!!!!!!! L"LMU_Data");
     if (hParent && hEvent && hMapFile) {
       //!!!!!!!!!!! Note that Scoring didn't map...
       if (SharedMemoryTelemetryData* pBuf = (SharedMemoryTelemetryData*)MapViewOfFile(hMapFile, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(SharedMemoryTelemetryData))) {

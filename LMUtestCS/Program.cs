@@ -1,9 +1,10 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.IO.MemoryMappedFiles;
-using System.Threading;
-using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 
 class Program
 {
@@ -90,38 +91,46 @@ class Program
 
     static void ProcessSharedMemory(byte[] data, int length)
     {
-        Console.WriteLine($"Shared memory update: {length} bytes");
-        try
-        {
-            var parsed = LMUSharedMemory.CopySharedMemoryObj(data, length);
-            // Events
-            for (int i = 0; i < parsed.generic.events.Length; i++)
-            {
-                if (parsed.generic.events[i] != 0)
-                    Console.WriteLine($"Event[{i}] = {parsed.generic.events[i]}");
-            }
-            // Paths
-            if (!string.IsNullOrEmpty(parsed.paths.userData)) Console.WriteLine($"Path[userData]: {parsed.paths.userData}");
-            if (!string.IsNullOrEmpty(parsed.paths.pluginsFolder)) Console.WriteLine($"Path[plugins]: {parsed.paths.pluginsFolder}");
-            // Scoring summary
-            Console.WriteLine($"Scoring: numVehicles={parsed.scoring.scoringInfo.mNumVehicles}, streamBytes={parsed.scoring.scoringStream?.Length ?? 0}");
-            if (parsed.scoring.vehScoringInfo.Count > 0)
-            {
-                var v = parsed.scoring.vehScoringInfo[0];
-                Console.WriteLine($"Vehicle[0]: ID={v.mID}, Driver='{v.mDriverName}', Veh='{v.mVehicleName}', Place={v.mPlace}, LapDist={v.mLapDist}");
-            }
-            // Telemetry summary
-            Console.WriteLine($"Telemetry: activeVehicles={parsed.telemetry.activeVehicles}");
-            if (parsed.telemetry.telemInfo.Count > 0)
-            {
-                var t = parsed.telemetry.telemInfo[0];
-                Console.WriteLine($"Telem[0]: ID={t.mID}, Veh='{t.mVehicleName}', Pos=({t.mPos.x:0.###},{t.mPos.y:0.###},{t.mPos.z:0.###})");
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error parsing shared memory: {ex.Message}");
-        }
+    var handleBuffer = GCHandle.Alloc(data, GCHandleType.Pinned);
+    var mappedData = (lmuSharedMemory.LMUData.SharedMemoryObjectOut)Marshal.PtrToStructure(handleBuffer.AddrOfPinnedObject(), typeof(lmuSharedMemory.LMUData.SharedMemoryObjectOut));
+    handleBuffer.Free();
+
+    Console.WriteLine($"Circuit: {mappedData.scoring.scoringInfo.mTrackName}");
+    var v = mappedData.scoring.vehScoringInfo[0];
+    Console.WriteLine($"Vehicle[0]: ID={v.mID}, Driver='{v.mDriverName}', Veh='{v.mVehicleName}', Place={v.mPlace}, LapDist={v.mLapDist}");
+
+    Console.WriteLine($"Shared memory update: {length} bytes");
+        //try
+        //{
+        //    var parsed = LMUSharedMemory.CopySharedMemoryObj(data, length);
+        //    // Events
+        //    for (int i = 0; i < parsed.generic.events.Length; i++)
+        //    {
+        //        if (parsed.generic.events[i] != 0)
+        //            Console.WriteLine($"Event[{i}] = {parsed.generic.events[i]}");
+        //    }
+        //    // Paths
+        //    if (!string.IsNullOrEmpty(parsed.paths.userData)) Console.WriteLine($"Path[userData]: {parsed.paths.userData}");
+        //    if (!string.IsNullOrEmpty(parsed.paths.pluginsFolder)) Console.WriteLine($"Path[plugins]: {parsed.paths.pluginsFolder}");
+        //    // Scoring summary
+        //    Console.WriteLine($"Scoring: numVehicles={parsed.scoring.scoringInfo.mNumVehicles}, streamBytes={parsed.scoring.scoringStream?.Length ?? 0}");
+        //    if (parsed.scoring.vehScoringInfo.Count > 0)
+        //    {
+        //        var v = parsed.scoring.vehScoringInfo[0];
+        //        Console.WriteLine($"Vehicle[0]: ID={v.mID}, Driver='{v.mDriverName}', Veh='{v.mVehicleName}', Place={v.mPlace}, LapDist={v.mLapDist}");
+        //    }
+        //    // Telemetry summary
+        //    Console.WriteLine($"Telemetry: activeVehicles={parsed.telemetry.activeVehicles}");
+        //    if (parsed.telemetry.telemInfo.Count > 0)
+        //    {
+        //        var t = parsed.telemetry.telemInfo[0];
+        //        Console.WriteLine($"Telem[0]: ID={t.mID}, Veh='{t.mVehicleName}', Pos=({t.mPos.x:0.###},{t.mPos.y:0.###},{t.mPos.z:0.###})");
+        //    }
+        //}
+        //catch (Exception ex)
+        //{
+        //    Console.Error.WriteLine($"Error parsing shared memory: {ex.Message}");
+        //}
     }
 
     static int? FindLMUPid()
